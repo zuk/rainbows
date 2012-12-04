@@ -1,3 +1,5 @@
+#include "rainbows.h"
+
 %%{
     machine rainbowParser;
 
@@ -14,5 +16,18 @@
 
 %% write data;
 
-%% write init;
-%% write exec;
+void RainbowFSM::init( ) 
+{
+    %% write init;   
+}
+
+void RainbowFSM::exec(const String rainbow) 
+{
+    int len = rainbow.length();
+    char rainbowChars[len+1];
+    rainbow.toCharArray(rainbowChars, len);
+    const char *p = rainbowChars;
+    const char *pe = rainbowChars + len;
+
+    %% write exec;
+}

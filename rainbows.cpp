@@ -1,11 +1,13 @@
 
 #line 1 "rainbows.rl"
-
-#line 13 "rainbows.rl"
-
+#include "rainbows.h"
 
 
-#line 9 "rainbows.c"
+#line 15 "rainbows.rl"
+
+
+
+#line 11 "rainbows.cpp"
 static const char _rainbowParser_actions[] = {
 	0, 1, 0
 };
@@ -48,17 +50,29 @@ static const int rainbowParser_error = 0;
 static const int rainbowParser_en_main = 2;
 
 
-#line 16 "rainbows.rl"
+#line 18 "rainbows.rl"
 
-
-#line 55 "rainbows.c"
+void RainbowFSM::init( ) 
+{
+    
+#line 59 "rainbows.cpp"
 	{
 	cs = rainbowParser_start;
 	}
 
-#line 18 "rainbows.rl"
+#line 22 "rainbows.rl"
+}
 
-#line 62 "rainbows.c"
+void RainbowFSM::exec(const String rainbow) 
+{
+    int len = rainbow.length();
+    char rainbowChars[len+1];
+    rainbow.toCharArray(rainbowChars, len);
+    const char *p = rainbowChars;
+    const char *pe = rainbowChars + len;
+
+    
+#line 76 "rainbows.cpp"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -132,12 +146,12 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 4 "rainbows.rl"
+#line 6 "rainbows.rl"
 	{
         setLED(R, p);
     }
 	break;
-#line 141 "rainbows.c"
+#line 155 "rainbows.cpp"
 		}
 	}
 
@@ -149,3 +163,6 @@ _again:
 	_test_eof: {}
 	_out: {}
 	}
+
+#line 33 "rainbows.rl"
+}
