@@ -16,7 +16,7 @@
 
 %% write data;
 
-void RainbowFSM::init( ) 
+RainbowFSM::RainbowFSM( ) 
 {
     %% write init;   
 }

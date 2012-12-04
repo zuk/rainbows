@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include "Arduino.h"
 
-struct RainbowFSM
+class RainbowFSM
 {
-    int cs;
+    public:
+        RainbowFSM( );
+        void exec(const String rainbow);
 
-    void init( );
-    void exec(const String rainbow);
+    protected:
+        int cs;
 };

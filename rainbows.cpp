@@ -52,7 +52,7 @@ static const int rainbowParser_en_main = 2;
 
 #line 18 "rainbows.rl"
 
-void RainbowFSM::init( ) 
+RainbowFSM::RainbowFSM( ) 
 {
     
 #line 59 "rainbows.cpp"
