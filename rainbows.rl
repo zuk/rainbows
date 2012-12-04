@@ -3,11 +3,20 @@
 %%{
     machine rainbowParser;
 
-    action found_val {
-        setLED(R, fpc);
+
+    action start_val {
+        sscanf(p, "%x", &val);
     }
 
-    val = ([0-9a-f]{2}) @found_val;
+    action end_val {
+        int second;
+        sscanf(p, "%x", &second);
+        val = val * 16 + second;
+        Serial.println("setting val to "+val);
+        setValue(val);
+    }
+
+    val = ([0-9a-f]{2}) >start_val @end_val;
     tween = ('-'+);
     nada = (' '+);
 
@@ -16,12 +25,13 @@
 
 %% write data;
 
-RainbowFSM::RainbowFSM( ) 
+//Rainbows::Rainbows(int pin) : pin(pin)
+Rainbows::Rainbows()
 {
     %% write init;   
 }
 
-void RainbowFSM::exec(const String rainbow) 
+void Rainbows::exec(const String rainbow)
 {
     int len = rainbow.length();
     char rainbowChars[len+1];

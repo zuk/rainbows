@@ -3,13 +3,13 @@
 #include "rainbows.h"
 
 
-#line 15 "rainbows.rl"
+#line 24 "rainbows.rl"
 
 
 
 #line 11 "rainbows.cpp"
 static const char _rainbowParser_actions[] = {
-	0, 1, 0
+	0, 1, 0, 1, 1
 };
 
 static const char _rainbowParser_key_offsets[] = {
@@ -39,7 +39,7 @@ static const char _rainbowParser_trans_targs[] = {
 };
 
 static const char _rainbowParser_trans_actions[] = {
-	1, 1, 0, 0, 0, 0, 0, 0, 
+	3, 3, 0, 0, 0, 1, 1, 0, 
 	0
 };
 
@@ -50,20 +50,21 @@ static const int rainbowParser_error = 0;
 static const int rainbowParser_en_main = 2;
 
 
-#line 18 "rainbows.rl"
+#line 27 "rainbows.rl"
 
-RainbowFSM::RainbowFSM( ) 
+//Rainbows::Rainbows(int pin) : pin(pin)
+Rainbows::Rainbows()
 {
     
-#line 59 "rainbows.cpp"
+#line 60 "rainbows.cpp"
 	{
 	cs = rainbowParser_start;
 	}
 
-#line 22 "rainbows.rl"
+#line 32 "rainbows.rl"
 }
 
-void RainbowFSM::exec(const String rainbow) 
+void Rainbows::exec(const String rainbow)
 {
     int len = rainbow.length();
     char rainbowChars[len+1];
@@ -72,7 +73,7 @@ void RainbowFSM::exec(const String rainbow)
     const char *pe = rainbowChars + len;
 
     
-#line 76 "rainbows.cpp"
+#line 77 "rainbows.cpp"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -146,12 +147,22 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 6 "rainbows.rl"
+#line 7 "rainbows.rl"
 	{
-        setLED(R, p);
+        sscanf(p, "%x", &val);
     }
 	break;
-#line 155 "rainbows.cpp"
+	case 1:
+#line 11 "rainbows.rl"
+	{
+        int second;
+        sscanf(p, "%x", &second);
+        val = val * 16 + second;
+        Serial.println("setting val to "+val);
+        setValue(val);
+    }
+	break;
+#line 166 "rainbows.cpp"
 		}
 	}
 
@@ -164,5 +175,5 @@ _again:
 	_out: {}
 	}
 
-#line 33 "rainbows.rl"
+#line 43 "rainbows.rl"
 }
