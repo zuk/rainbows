@@ -3,7 +3,7 @@
 #include "rainbows.h"
 
 
-#line 24 "rainbows.rl"
+#line 23 "rainbows.rl"
 
 
 
@@ -50,7 +50,7 @@ static const int rainbowParser_error = 0;
 static const int rainbowParser_en_main = 2;
 
 
-#line 27 "rainbows.rl"
+#line 26 "rainbows.rl"
 
 //Rainbows::Rainbows(int pin) : pin(pin)
 Rainbows::Rainbows()
@@ -61,19 +61,24 @@ Rainbows::Rainbows()
 	cs = rainbowParser_start;
 	}
 
-#line 32 "rainbows.rl"
+#line 31 "rainbows.rl"
 }
 
-void Rainbows::exec(const String rainbow)
+void Rainbows::load(const String melody)
 {
-    int len = rainbow.length();
+    this->melody = melody;
+}
+
+void Rainbows::exec()
+{
+    int len = melody.length();
     char rainbowChars[len+1];
-    rainbow.toCharArray(rainbowChars, len);
+    melody.toCharArray(rainbowChars, len);
     const char *p = rainbowChars;
     const char *pe = rainbowChars + len;
 
     
-#line 77 "rainbows.cpp"
+#line 82 "rainbows.cpp"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -159,10 +164,9 @@ _match:
         sscanf(p, "%x", &second);
         val = val * 16 + second;
         Serial.println("setting val to "+val);
-        setValue(val);
     }
 	break;
-#line 166 "rainbows.cpp"
+#line 170 "rainbows.cpp"
 		}
 	}
 
@@ -175,5 +179,5 @@ _again:
 	_out: {}
 	}
 
-#line 43 "rainbows.rl"
+#line 47 "rainbows.rl"
 }

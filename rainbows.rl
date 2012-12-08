@@ -13,7 +13,6 @@
         sscanf(p, "%x", &second);
         val = val * 16 + second;
         Serial.println("setting val to "+val);
-        setValue(val);
     }
 
     val = ([0-9a-f]{2}) >start_val @end_val;
@@ -31,11 +30,16 @@ Rainbows::Rainbows()
     %% write init;   
 }
 
-void Rainbows::exec(const String rainbow)
+void Rainbows::load(const String melody)
 {
-    int len = rainbow.length();
+    this->melody = melody;
+}
+
+void Rainbows::exec()
+{
+    int len = melody.length();
     char rainbowChars[len+1];
-    rainbow.toCharArray(rainbowChars, len);
+    melody.toCharArray(rainbowChars, len);
     const char *p = rainbowChars;
     const char *pe = rainbowChars + len;
 

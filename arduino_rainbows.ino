@@ -1,11 +1,15 @@
 #include "rainbows.h"
+Rainbows rainbow = Rainbows();
 
-String rS = "ff      00------ff-<~>---";
-Rainbows *rainbow = new Rainbows();
+void setValue(int val) {
+    analogWrite(5, val);
+}
 
 void setup()
 {
-    // do nothing
+    rainbow.setValue = *setValue;
+
+    rainbow.load("ff      00------ff-<~>---");
 }
 
 void loop() 

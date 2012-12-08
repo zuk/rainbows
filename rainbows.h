@@ -18,13 +18,14 @@ class Rainbows
 {
     public:
         Rainbows();
-        void exec(const String rainbow);
+        void load(const String rainbow);
+        void exec();
 
         void (*setValue)(int val);
 
     protected:
         int cs;
-        int pin;
         int val;
+        String melody;
 
 };
