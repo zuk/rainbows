@@ -12,7 +12,7 @@ Rainbows::Rainbows()
 {
     %% write init;
     nextUpdateAt = 0;
-    melodyChars = "ff-00ff";
+    //melodyChars = "";
 }
 
 // void Rainbows::load(const String melody)
@@ -25,11 +25,20 @@ Rainbows::Rainbows()
 //     Serial.println("Loaded melody: "+melody);
 // }
 
+void Rainbows::load(const String melody) {
+    Serial.println("Loading melody: "+melody);
+    melody.toCharArray(&melodyChars[strlen(melodyChars)], melody.length()+1);
+
+    pe = &melodyChars[strlen(melodyChars)];
+
+    Serial.print("Combined melody is: ");
+    Serial.println(melodyChars);
+}
+
 
 void Rainbows::start()
 {
     p = melodyChars;
-    pe = melodyChars + 7;
     const char *eof = pe;
     Serial.println("start");
     Serial.print("Starting with p: ");
@@ -60,7 +69,7 @@ void Rainbows::update()
     //     Serial.print(" ... next at ");
     //     Serial.println(nextUpdateAt);
     // }
-    if (millis() >= nextUpdateAt) {
+    if (millis() >= nextUpdateAt && pe != p) {
         if (currentVal != targetVal) {
             writeVal(targetVal);
             currentVal = targetVal;

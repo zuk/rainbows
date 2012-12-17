@@ -9,7 +9,7 @@
 
 #line 11 "rainbows.cpp"
 static const char _RainbowParser_actions[] = {
-	0, 1, 0, 1, 1
+	0, 1, 0, 1, 1, 1, 2
 };
 
 static const char _RainbowParser_key_offsets[] = {
@@ -39,7 +39,7 @@ static const char _RainbowParser_trans_targs[] = {
 };
 
 static const char _RainbowParser_trans_actions[] = {
-	3, 3, 0, 0, 0, 1, 1, 0, 
+	3, 3, 0, 0, 5, 1, 1, 0, 
 	0
 };
 
@@ -63,7 +63,7 @@ Rainbows::Rainbows()
 
 #line 14 "rainbows.rl"
     nextUpdateAt = 0;
-    melodyChars = "ff-00ff";
+    //melodyChars = "";
 }
 
 // void Rainbows::load(const String melody)
@@ -76,17 +76,26 @@ Rainbows::Rainbows()
 //     Serial.println("Loaded melody: "+melody);
 // }
 
+void Rainbows::load(const String melody) {
+    Serial.println("Loading melody: "+melody);
+    melody.toCharArray(&melodyChars[strlen(melodyChars)], melody.length()+1);
+
+    pe = &melodyChars[strlen(melodyChars)];
+
+    Serial.print("Combined melody is: ");
+    Serial.println(melodyChars);
+}
+
 
 void Rainbows::start()
 {
     p = melodyChars;
-    pe = melodyChars + 7;
     const char *eof = pe;
     Serial.println("start");
     Serial.print("Starting with p: ");
     Serial.print(p);
     char buff[50];
-    sprintf(buff,"[%p]" ,p);
+    sprintf(buff,"[%p]",p);
     Serial.print(" -> ");
     Serial.println(buff);
     resume();
@@ -98,11 +107,11 @@ void Rainbows::resume() {
     Serial.print("Resuming with p: ");
     Serial.print(p);
     char buff[50];
-    sprintf(buff,"[%p]" ,p);
+    sprintf(buff,"[%p]",p);
     Serial.print(" -> ");
     Serial.println(buff);
     
-#line 106 "rainbows.cpp"
+#line 115 "rainbows.cpp"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -199,11 +208,17 @@ _match:
         Serial.print(cp);
         Serial.print(" ");
         Serial.println(targetVal);
-        nextUpdateAt = millis() + 2000;
+        nextUpdateAt = millis() + 500;
         {p++; goto _out; }
     }
 	break;
-#line 207 "rainbows.cpp"
+	case 2:
+#line 28 "rainbow_parser_fsm.rl"
+	{
+        Serial.println("ignoring tween...");
+    }
+	break;
+#line 222 "rainbows.cpp"
 		}
 	}
 
@@ -216,7 +231,7 @@ _again:
 	_out: {}
 	}
 
-#line 54 "rainbows.rl"
+#line 63 "rainbows.rl"
 }
 
 void Rainbows::update()
@@ -226,7 +241,7 @@ void Rainbows::update()
     //     Serial.print(" ... next at ");
     //     Serial.println(nextUpdateAt);
     // }
-    if (millis() >= nextUpdateAt) {
+    if (millis() >= nextUpdateAt && pe != p) {
         if (currentVal != targetVal) {
             writeVal(targetVal);
             currentVal = targetVal;

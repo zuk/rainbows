@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "Arduino.h"
 
+#define MAX_MELODY_SIZE 1024
+
 // static const char _rainbowParser_actions[];
 // static const char _rainbowParser_key_offsets[];
 // static const char _rainbowParser_trans_keys[];
@@ -19,7 +21,7 @@ class Rainbows
 
     public:
         Rainbows();
-        //void load(const String rainbow);
+        void load(const String melody);
         // void load(char *melody);
         void start();
         void resume();
@@ -38,6 +40,6 @@ class Rainbows
         unsigned long nextUpdateAt; // the next update will run when millis() reaches this
 
         String melody;
-        char *melodyChars;
+        char melodyChars[MAX_MELODY_SIZE];
 
 };

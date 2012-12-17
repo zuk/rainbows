@@ -21,13 +21,17 @@
         Serial.print(cp);
         Serial.print(" ");
         Serial.println(targetVal);
-        nextUpdateAt = millis() + 2000;
+        nextUpdateAt = millis() + 500;
         fbreak;
+    }
+
+    action tween {
+        Serial.println("ignoring tween...");
     }
 
     hex = ([0-9a-f]);
     val = (hex $start_val hex $end_val);
-    tween = ('-'+);
+    tween = ('-'+) $tween;
     nada = (' '+);
 
     main := (tween+ | nada+ | val+)* ;
