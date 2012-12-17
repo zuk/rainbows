@@ -1,18 +1,33 @@
 #include "rainbows.h"
 Rainbows rainbow = Rainbows();
 
-void setValue(int val) {
-    analogWrite(5, val);
+# define L1 5
+# define L2 6
+
+boolean played = false;
+
+void writeVal(int val) {
+    analogWrite(L1, val);
 }
 
 void setup()
 {
-    rainbow.setValue = *setValue;
+    Serial.begin(9600);
+    Serial.println("-----------------");
+    //Serial.flush();
 
-    rainbow.load("ff      00------ff-<~>---");
+
+    rainbow.writeVal = *writeVal;
+
+    //rainbow.load("ff      00------ff-<~>---");
+    //rainbow.load("ff-00ff00");
 }
 
 void loop() 
 {
-    // also do nothing
+    if (!played) {
+        rainbow.start();
+        played = true;
+    }
+    rainbow.update();
 }

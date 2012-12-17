@@ -16,16 +16,28 @@
 
 class Rainbows
 {
+
     public:
         Rainbows();
-        void load(const String rainbow);
-        void exec();
+        //void load(const String rainbow);
+        // void load(char *melody);
+        void start();
+        void resume();
+        void update();
 
-        void (*setValue)(int val);
+        void (*writeVal)(int val);
 
     protected:
         int cs;
-        int val;
+        const char *p;
+        const char *pe;
+
+        int targetVal; // target value
+        int currentVal; // current value
+
+        unsigned long nextUpdateAt; // the next update will run when millis() reaches this
+
         String melody;
+        char *melodyChars;
 
 };

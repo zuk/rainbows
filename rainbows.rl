@@ -1,25 +1,8 @@
 #include "rainbows.h"
 
 %%{
-    machine rainbowParser;
-
-
-    action start_val {
-        sscanf(p, "%x", &val);
-    }
-
-    action end_val {
-        int second;
-        sscanf(p, "%x", &second);
-        val = val * 16 + second;
-        Serial.println("setting val to "+val);
-    }
-
-    val = ([0-9a-f]{2}) >start_val @end_val;
-    tween = ('-'+);
-    nada = (' '+);
-
-    main := ( val+ | tween | nada)* ;
+    machine RainbowParser;
+    include RainbowParser "rainbow_parser_fsm.rl";
 }%%
 
 %% write data;
@@ -27,21 +10,61 @@
 //Rainbows::Rainbows(int pin) : pin(pin)
 Rainbows::Rainbows()
 {
-    %% write init;   
+    %% write init;
+    nextUpdateAt = 0;
+    melodyChars = "ff-00ff";
 }
 
-void Rainbows::load(const String melody)
+// void Rainbows::load(const String melody)
+// {
+//     this->melody = melody;
+
+//     int len = melody.length();
+//     melody.toCharArray(melodyChars, len+1);
+
+//     Serial.println("Loaded melody: "+melody);
+// }
+
+
+void Rainbows::start()
 {
-    this->melody = melody;
+    p = melodyChars;
+    pe = melodyChars + 7;
+    const char *eof = pe;
+    Serial.println("start");
+    Serial.print("Starting with p: ");
+    Serial.print(p);
+    char buff[50];
+    sprintf(buff,"[%p]",p);
+    Serial.print(" -> ");
+    Serial.println(buff);
+    resume();
 }
 
-void Rainbows::exec()
-{
-    int len = melody.length();
-    char rainbowChars[len+1];
-    melody.toCharArray(rainbowChars, len);
-    const char *p = rainbowChars;
-    const char *pe = rainbowChars + len;
-
+void Rainbows::resume() {
+    const char *eof = pe;
+    // Serial.println("resume");
+    Serial.print("Resuming with p: ");
+    Serial.print(p);
+    char buff[50];
+    sprintf(buff,"[%p]",p);
+    Serial.print(" -> ");
+    Serial.println(buff);
     %% write exec;
+}
+
+void Rainbows::update()
+{
+    // if (millis() % 1000 || millis() == nextUpdateAt) {
+    //     Serial.print(millis());
+    //     Serial.print(" ... next at ");
+    //     Serial.println(nextUpdateAt);
+    // }
+    if (millis() >= nextUpdateAt) {
+        if (currentVal != targetVal) {
+            writeVal(targetVal);
+            currentVal = targetVal;
+        }
+        resume();
+    }
 }
