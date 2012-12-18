@@ -1,7 +1,7 @@
 all: cpp dot pdf
 
 cpp:
-	ragel -C rainbows.rl -o rainbows.cpp
+	ragel -G0 -C rainbows.rl -o rainbows.cpp
 
 dot:
 	ragel -V -p rainbows.rl > rainbows.dot

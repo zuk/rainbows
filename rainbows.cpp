@@ -9,45 +9,22 @@
 
 #line 11 "rainbows.cpp"
 static const char _RainbowParser_actions[] = {
-	0, 1, 0, 1, 1, 1, 2
+	0, 1, 0, 2, 1, 6, 2, 2, 
+	6, 2, 3, 6, 3, 0, 1, 6, 
+	3, 0, 3, 6, 3, 4, 5, 0, 
+	4, 4, 0, 1, 6, 4, 4, 0, 
+	3, 6
 };
 
-static const char _RainbowParser_key_offsets[] = {
-	0, 0, 4
+static const char _RainbowParser_eof_actions[] = {
+	0, 0, 0, 0, 0, 1, 20
 };
 
-static const char _RainbowParser_trans_keys[] = {
-	48, 57, 97, 102, 32, 45, 48, 57, 
-	97, 102, 0
-};
-
-static const char _RainbowParser_single_lengths[] = {
-	0, 0, 2
-};
-
-static const char _RainbowParser_range_lengths[] = {
-	0, 2, 2
-};
-
-static const char _RainbowParser_index_offsets[] = {
-	0, 0, 3
-};
-
-static const char _RainbowParser_trans_targs[] = {
-	2, 2, 0, 2, 2, 1, 1, 0, 
-	0
-};
-
-static const char _RainbowParser_trans_actions[] = {
-	3, 3, 0, 0, 5, 1, 1, 0, 
-	0
-};
-
-static const int RainbowParser_start = 2;
-static const int RainbowParser_first_final = 2;
+static const int RainbowParser_start = 4;
+static const int RainbowParser_first_final = 4;
 static const int RainbowParser_error = 0;
 
-static const int RainbowParser_en_main = 2;
+static const int RainbowParser_en_main = 4;
 
 
 #line 9 "rainbows.rl"
@@ -56,13 +33,18 @@ static const int RainbowParser_en_main = 2;
 Rainbows::Rainbows()
 {
     
-#line 60 "rainbows.cpp"
+#line 37 "rainbows.cpp"
 	{
 	cs = RainbowParser_start;
 	}
 
 #line 14 "rainbows.rl"
     nextUpdateAt = 0;
+    p = &melodyChars[0];
+    pe = &melodyChars[0];
+    tweenFrames = 0;
+    mode = INSTANT;
+    currentVal = 0;
     //melodyChars = "";
 }
 
@@ -77,150 +59,236 @@ Rainbows::Rainbows()
 // }
 
 void Rainbows::load(const String melody) {
-    Serial.println("Loading melody: "+melody);
-    melody.toCharArray(&melodyChars[strlen(melodyChars)], melody.length()+1);
+    p = &melodyChars[0];
+    pe = &melodyChars[0];
 
-    pe = &melodyChars[strlen(melodyChars)];
+    Serial.print("Initial melody is: ");
+    Serial.println(melodyChars);
+    char buff[50];
+    sprintf(buff,"[%p]",&melodyChars[0]);
+    Serial.print(" -> ");
+    Serial.println(buff);
+
+    Serial.println("Loading melody: "+melody);
+    melody.toCharArray(melodyChars, melody.length()+1);
+
+    pe = pe + melody.length();
+    //*pe = '\0';
+
+    char pb[10];
+    char peb[10];
+    sprintf(pb,"[%p]",p);
+    sprintf(peb,"[%p]",pe);
+
 
     Serial.print("Combined melody is: ");
-    Serial.println(melodyChars);
+    Serial.print(melodyChars);
+    Serial.print(" ");
+
+    Serial.print(pb);
+    Serial.print("-");
+    Serial.println(peb);
+
+}
+
+void Rainbows::debugState(int state) {
+    Serial.print("(");
+    Serial.print(state);
+    Serial.print(")");
+}
+
+void Rainbows::debug(int state) {
+    char pb[10];
+    sprintf(pb,"[%p]",p);
+    debugState(state);
+    Serial.print(pb);
+    Serial.print(":");
+    Serial.println(p);
 }
 
 
 void Rainbows::start()
 {
-    p = melodyChars;
-    const char *eof = pe;
-    Serial.println("start");
-    Serial.print("Starting with p: ");
-    Serial.print(p);
-    char buff[50];
-    sprintf(buff,"[%p]",p);
-    Serial.print(" -> ");
-    Serial.println(buff);
+    p = &melodyChars[0];
+     char pb[10];
+    char peb[10];
+    sprintf(pb,"<%p>",&melodyChars[0]);
+    sprintf(peb,"<%p>",p);
+    Serial.print(pb);
+    Serial.print("-");
+    Serial.println(peb);
     resume();
 }
 
 void Rainbows::resume() {
     const char *eof = pe;
-    // Serial.println("resume");
-    Serial.print("Resuming with p: ");
-    Serial.print(p);
-    char buff[50];
-    sprintf(buff,"[%p]",p);
-    Serial.print(" -> ");
-    Serial.println(buff);
+
+    char eofb[10];
+    sprintf(eofb,"<%p>",eof);
+    Serial.print("resuming with EOF:");
+    Serial.println(eofb);
+    debug(cs);
+
     
-#line 115 "rainbows.cpp"
+#line 134 "rainbows.cpp"
 	{
-	int _klen;
-	unsigned int _trans;
 	const char *_acts;
 	unsigned int _nacts;
-	const char *_keys;
 
 	if ( p == pe )
 		goto _test_eof;
 	if ( cs == 0 )
 		goto _out;
 _resume:
-	_keys = _RainbowParser_trans_keys + _RainbowParser_key_offsets[cs];
-	_trans = _RainbowParser_index_offsets[cs];
-
-	_klen = _RainbowParser_single_lengths[cs];
-	if ( _klen > 0 ) {
-		const char *_lower = _keys;
-		const char *_mid;
-		const char *_upper = _keys + _klen - 1;
-		while (1) {
-			if ( _upper < _lower )
-				break;
-
-			_mid = _lower + ((_upper-_lower) >> 1);
-			if ( (*p) < *_mid )
-				_upper = _mid - 1;
-			else if ( (*p) > *_mid )
-				_lower = _mid + 1;
-			else {
-				_trans += (unsigned int)(_mid - _keys);
-				goto _match;
-			}
-		}
-		_keys += _klen;
-		_trans += _klen;
+	switch ( cs ) {
+case 4:
+	if ( (*p) == 62 )
+		goto tr3;
+	if ( (*p) > 57 ) {
+		if ( 97 <= (*p) && (*p) <= 102 )
+			goto tr5;
+	} else if ( (*p) >= 48 )
+		goto tr5;
+	goto tr1;
+case 0:
+	goto _out;
+case 1:
+	if ( (*p) > 57 ) {
+		if ( 97 <= (*p) && (*p) <= 102 )
+			goto tr0;
+	} else if ( (*p) >= 48 )
+		goto tr0;
+	goto tr1;
+case 5:
+	if ( (*p) == 62 )
+		goto tr7;
+	if ( (*p) > 57 ) {
+		if ( 97 <= (*p) && (*p) <= 102 )
+			goto tr6;
+	} else if ( (*p) >= 48 )
+		goto tr6;
+	goto tr1;
+case 2:
+	if ( (*p) == 62 )
+		goto tr3;
+	if ( (*p) > 57 ) {
+		if ( 97 <= (*p) && (*p) <= 102 )
+			goto tr2;
+	} else if ( (*p) >= 48 )
+		goto tr2;
+	goto tr1;
+case 3:
+	if ( (*p) > 57 ) {
+		if ( 97 <= (*p) && (*p) <= 102 )
+			goto tr4;
+	} else if ( (*p) >= 48 )
+		goto tr4;
+	goto tr1;
+case 6:
+	if ( (*p) == 62 )
+		goto tr9;
+	if ( (*p) > 57 ) {
+		if ( 97 <= (*p) && (*p) <= 102 )
+			goto tr8;
+	} else if ( (*p) >= 48 )
+		goto tr8;
+	goto tr1;
 	}
 
-	_klen = _RainbowParser_range_lengths[cs];
-	if ( _klen > 0 ) {
-		const char *_lower = _keys;
-		const char *_mid;
-		const char *_upper = _keys + (_klen<<1) - 2;
-		while (1) {
-			if ( _upper < _lower )
-				break;
+	tr1: cs = 0; goto _again;
+	tr5: cs = 1; goto f1;
+	tr6: cs = 1; goto f4;
+	tr8: cs = 1; goto f7;
+	tr3: cs = 2; goto f2;
+	tr7: cs = 2; goto f5;
+	tr9: cs = 2; goto f8;
+	tr2: cs = 3; goto f1;
+	tr0: cs = 5; goto f0;
+	tr4: cs = 6; goto f0;
 
-			_mid = _lower + (((_upper-_lower) >> 1) & ~1);
-			if ( (*p) < _mid[0] )
-				_upper = _mid - 2;
-			else if ( (*p) > _mid[1] )
-				_lower = _mid + 2;
-			else {
-				_trans += (unsigned int)((_mid - _keys)>>1);
-				goto _match;
-			}
-		}
-		_trans += _klen;
-	}
+	f1: _acts = _RainbowParser_actions + 3; goto execFuncs;
+	f0: _acts = _RainbowParser_actions + 6; goto execFuncs;
+	f2: _acts = _RainbowParser_actions + 9; goto execFuncs;
+	f4: _acts = _RainbowParser_actions + 12; goto execFuncs;
+	f5: _acts = _RainbowParser_actions + 16; goto execFuncs;
+	f7: _acts = _RainbowParser_actions + 24; goto execFuncs;
+	f8: _acts = _RainbowParser_actions + 29; goto execFuncs;
 
-_match:
-	cs = _RainbowParser_trans_targs[_trans];
-
-	if ( _RainbowParser_trans_actions[_trans] == 0 )
-		goto _again;
-
-	_acts = _RainbowParser_actions + _RainbowParser_trans_actions[_trans];
-	_nacts = (unsigned int) *_acts++;
-	while ( _nacts-- > 0 )
-	{
-		switch ( *_acts++ )
-		{
+execFuncs:
+	_nacts = *_acts++;
+	while ( _nacts-- > 0 ) {
+		switch ( *_acts++ ) {
 	case 0:
 #line 4 "rainbow_parser_fsm.rl"
 	{
-        char c = (*p);
-        const char cp[2] = {p[0], '\0'};
-        sscanf(p, "%1x", &targetVal);
-        Serial.print("start_val ");
-        Serial.print(cp);
-        Serial.print(" ");
-        Serial.println(targetVal);
+        Serial.println(";");
+        debug(cs);
+        nextUpdateAt = millis() + 1000/FPS;
+        {p++; goto _out; }
     }
 	break;
 	case 1:
-#line 14 "rainbow_parser_fsm.rl"
+#line 11 "rainbow_parser_fsm.rl"
 	{
+        Serial.print((*p));
+        char c = (*p);
+        const char cp[2] = {p[0], '\0'};
+        sscanf(p, "%1x", &targetVal);
+        /*Serial.print("begin_intensity ");
+        Serial.print(cp);
+        Serial.print(" ");
+        Serial.println(targetVal);*/
+    }
+	break;
+	case 2:
+#line 22 "rainbow_parser_fsm.rl"
+	{
+        //Serial.print(fc);
         char c = (*p);
         int second;
         const char cp[2] = {p[0], '\0'};
         sscanf(cp, "%x", &second);
         targetVal = targetVal * 16 + second;
-        Serial.print("end_val ");
+        /*Serial.print("finish_intensity ");
         Serial.print(cp);
         Serial.print(" ");
-        Serial.println(targetVal);
-        nextUpdateAt = millis() + 500;
-        {p++; goto _out; }
+        Serial.println(targetVal);*/
     }
 	break;
-	case 2:
-#line 28 "rainbow_parser_fsm.rl"
+	case 3:
+#line 35 "rainbow_parser_fsm.rl"
 	{
-        Serial.println("ignoring tween...");
+        Serial.print((*p));
+        tweenFrames++;
     }
 	break;
-#line 222 "rainbows.cpp"
+	case 4:
+#line 40 "rainbow_parser_fsm.rl"
+	{
+        //Serial.println("ignoring tween...");
+        mode = LINEAR;
+        Serial.print("tv:");
+        Serial.print(targetVal);
+        Serial.print(" - ");
+        Serial.print("cv:");
+        Serial.print(currentVal);
+        Serial.print(" / ");
+        Serial.print(tweenFrames * FPS);
+        nextIncrement = (targetVal - currentVal) / (tweenFrames * FPS);
+        Serial.print(" ni: ");
+        Serial.println(nextIncrement);
+    }
+	break;
+	case 6:
+#line 62 "rainbow_parser_fsm.rl"
+	{
+        debug(cs);
+    }
+	break;
+#line 289 "rainbows.cpp"
 		}
 	}
+	goto _again;
 
 _again:
 	if ( cs == 0 )
@@ -228,10 +296,56 @@ _again:
 	if ( ++p != pe )
 		goto _resume;
 	_test_eof: {}
+	if ( p == eof )
+	{
+	const char *__acts = _RainbowParser_actions + _RainbowParser_eof_actions[cs];
+	unsigned int __nacts = (unsigned int) *__acts++;
+	while ( __nacts-- > 0 ) {
+		switch ( *__acts++ ) {
+	case 0:
+#line 4 "rainbow_parser_fsm.rl"
+	{
+        Serial.println(";");
+        debug(cs);
+        nextUpdateAt = millis() + 1000/FPS;
+        {p++; goto _out; }
+    }
+	break;
+	case 4:
+#line 40 "rainbow_parser_fsm.rl"
+	{
+        //Serial.println("ignoring tween...");
+        mode = LINEAR;
+        Serial.print("tv:");
+        Serial.print(targetVal);
+        Serial.print(" - ");
+        Serial.print("cv:");
+        Serial.print(currentVal);
+        Serial.print(" / ");
+        Serial.print(tweenFrames * FPS);
+        nextIncrement = (targetVal - currentVal) / (tweenFrames * FPS);
+        Serial.print(" ni: ");
+        Serial.println(nextIncrement);
+    }
+	break;
+	case 5:
+#line 55 "rainbow_parser_fsm.rl"
+	{
+        Serial.println("&");
+        cs = 4;
+        debug(cs);
+        {p = (( melodyChars))-1;}
+    }
+	break;
+#line 341 "rainbows.cpp"
+		}
+	}
+	}
+
 	_out: {}
 	}
 
-#line 63 "rainbows.rl"
+#line 105 "rainbows.rl"
 }
 
 void Rainbows::update()
@@ -242,10 +356,28 @@ void Rainbows::update()
     //     Serial.println(nextUpdateAt);
     // }
     if (millis() >= nextUpdateAt && pe != p) {
-        if (currentVal != targetVal) {
-            writeVal(targetVal);
-            currentVal = targetVal;
+        if (currentVal == targetVal) {
+            resume();
+        } else {
+            if (mode == INSTANT) {
+                currentVal = targetVal;
+            } else {
+                if (currentVal + nextIncrement >= 255 || currentVal + nextIncrement <= 0) {
+                    Serial.println("overvlow");
+                    currentVal = targetVal;
+                    tweenFrames = 0;
+                } else {
+                    currentVal += nextIncrement;
+                    Serial.print("+");
+                    Serial.print(nextIncrement);
+                    Serial.print("=");
+                    Serial.println(currentVal);
+                }
+            }
+
+            Serial.print("writeVal:");
+            Serial.println(currentVal);
+            writeVal(currentVal);
         }
-        resume();
     }
 }

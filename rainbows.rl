@@ -12,6 +12,11 @@ Rainbows::Rainbows()
 {
     %% write init;
     nextUpdateAt = 0;
+    p = &melodyChars[0];
+    pe = &melodyChars[0];
+    tweenFrames = 0;
+    mode = INSTANT;
+    currentVal = 0;
     //melodyChars = "";
 }
 
@@ -26,39 +31,76 @@ Rainbows::Rainbows()
 // }
 
 void Rainbows::load(const String melody) {
-    Serial.println("Loading melody: "+melody);
-    melody.toCharArray(&melodyChars[strlen(melodyChars)], melody.length()+1);
+    p = &melodyChars[0];
+    pe = &melodyChars[0];
 
-    pe = &melodyChars[strlen(melodyChars)];
+    Serial.print("Initial melody is: ");
+    Serial.println(melodyChars);
+    char buff[50];
+    sprintf(buff,"[%p]",&melodyChars[0]);
+    Serial.print(" -> ");
+    Serial.println(buff);
+
+    Serial.println("Loading melody: "+melody);
+    melody.toCharArray(melodyChars, melody.length()+1);
+
+    pe = pe + melody.length();
+    //*pe = '\0';
+
+    char pb[10];
+    char peb[10];
+    sprintf(pb,"[%p]",p);
+    sprintf(peb,"[%p]",pe);
+
 
     Serial.print("Combined melody is: ");
-    Serial.println(melodyChars);
+    Serial.print(melodyChars);
+    Serial.print(" ");
+
+    Serial.print(pb);
+    Serial.print("-");
+    Serial.println(peb);
+
+}
+
+void Rainbows::debugState(int state) {
+    Serial.print("(");
+    Serial.print(state);
+    Serial.print(")");
+}
+
+void Rainbows::debug(int state) {
+    char pb[10];
+    sprintf(pb,"[%p]",p);
+    debugState(state);
+    Serial.print(pb);
+    Serial.print(":");
+    Serial.println(p);
 }
 
 
 void Rainbows::start()
 {
-    p = melodyChars;
-    const char *eof = pe;
-    Serial.println("start");
-    Serial.print("Starting with p: ");
-    Serial.print(p);
-    char buff[50];
-    sprintf(buff,"[%p]",p);
-    Serial.print(" -> ");
-    Serial.println(buff);
+    p = &melodyChars[0];
+     char pb[10];
+    char peb[10];
+    sprintf(pb,"<%p>",&melodyChars[0]);
+    sprintf(peb,"<%p>",p);
+    Serial.print(pb);
+    Serial.print("-");
+    Serial.println(peb);
     resume();
 }
 
 void Rainbows::resume() {
     const char *eof = pe;
-    // Serial.println("resume");
-    Serial.print("Resuming with p: ");
-    Serial.print(p);
-    char buff[50];
-    sprintf(buff,"[%p]",p);
-    Serial.print(" -> ");
-    Serial.println(buff);
+
+    char eofb[10];
+    sprintf(eofb,"<%p>",eof);
+    Serial.print("resuming with EOF:");
+    Serial.println(eofb);
+    debug(cs);
+
     %% write exec;
 }
 
@@ -70,10 +112,28 @@ void Rainbows::update()
     //     Serial.println(nextUpdateAt);
     // }
     if (millis() >= nextUpdateAt && pe != p) {
-        if (currentVal != targetVal) {
-            writeVal(targetVal);
-            currentVal = targetVal;
+        if (currentVal == targetVal) {
+            resume();
+        } else {
+            if (mode == INSTANT) {
+                currentVal = targetVal;
+            } else {
+                if (currentVal + nextIncrement >= 255 || currentVal + nextIncrement <= 0) {
+                    Serial.println("overvlow");
+                    currentVal = targetVal;
+                    tweenFrames = 0;
+                } else {
+                    currentVal += nextIncrement;
+                    Serial.print("+");
+                    Serial.print(nextIncrement);
+                    Serial.print("=");
+                    Serial.println(currentVal);
+                }
+            }
+
+            Serial.print("writeVal:");
+            Serial.println(currentVal);
+            writeVal(currentVal);
         }
-        resume();
     }
 }
